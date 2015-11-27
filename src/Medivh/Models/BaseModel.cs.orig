@@ -10,12 +10,20 @@ namespace Medivh.Models
         Random random = new Random();
         public BaseModel()
         {
+<<<<<<< HEAD
+            //Thread.Sleep(10);
+            //var date = random.Next(240);
+            //this.CreateTime = DateTime.UtcNow.AddHours(-1 * date).Unix();
+            //Console.WriteLine(date);
+
+=======
             //注释部分为测试代码
             //Thread.Sleep(10);
            // var date = random.Next(240);
             //this.CreateTime = DateTime.UtcNow.AddHours(-1 * date).Unix();
             //Console.WriteLine(date);
             
+>>>>>>> 02c0078d4682c8f0f94c9c4668c7aa5f3774c137
             this.CreateTime = DateTime.UtcNow.Unix();
         }
         public ModuleTypeEnum ModuleType { get; set; }
