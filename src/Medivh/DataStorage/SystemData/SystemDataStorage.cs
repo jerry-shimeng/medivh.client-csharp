@@ -5,19 +5,19 @@ using Microsoft.VisualBasic.Devices;
 
 namespace Medivh.DataStorage.SystemData
 {
-    internal class SystemDataStorage  
+    internal class SystemDataStorage
     {
-     
+
         static Process currentProcess = Process.GetCurrentProcess();
         static ComputerInfo ci = new ComputerInfo();
-        static PerformanceCounter _oPerformanceCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+
         /// <summary>
         /// 获取系统信息
         /// </summary>
         /// <returns></returns>
         public static object GetSystemInfo()
-        { 
-            StringBuilder stringBuilder = new StringBuilder(); 
+        {
+            StringBuilder stringBuilder = new StringBuilder();
 
             stringBuilder.Append("{");
             stringBuilder.AppendFormat("\"OSarch\":\"{0}\",", OSarch());
@@ -27,9 +27,10 @@ namespace Medivh.DataStorage.SystemData
             stringBuilder.AppendFormat("\"TotalVirtualMemory\":{0},", TotalVirtualMemory());
             stringBuilder.AppendFormat("\"AvailablePhysicalMemory\":{0},", AvailablePhysicalMemory());
             stringBuilder.AppendFormat("\"AvailableVirtualMemory\":{0},", AvailableVirtualMemory());
-            stringBuilder.AppendFormat("\"PrivatePhysicalMemory\":{0},", PrivatePhysicalMemory()); 
+            stringBuilder.AppendFormat("\"PrivatePhysicalMemory\":{0},", PrivatePhysicalMemory());
             stringBuilder.AppendFormat("\"CpuNum\":{0},", GetCpuNumber());
             stringBuilder.AppendFormat("\"Cpu\":{0},", GetCpuUse());
+            stringBuilder.AppendFormat("\"AppCpu\":{0},", GetAppCpuUse());
             stringBuilder.AppendFormat("\"StartTime\":\"{0}\"", StartTime());
 
             stringBuilder.Append("}");
@@ -37,13 +38,38 @@ namespace Medivh.DataStorage.SystemData
             return Newtonsoft.Json.JsonConvert.DeserializeObject(json);
         }
 
+        private static PerformanceCounter _oPerformanceCounter = null;
+        public static double GetCpuUse()
+        {
+            if (_oPerformanceCounter == null)
+            {
+                try
+                {
+                    _oPerformanceCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                }
+                catch
+                {
+                }
+            }
+            if (_oPerformanceCounter != null)
+            {
+                return _oPerformanceCounter.NextValue();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         /// <summary>
         /// 获取cpu使用率
         /// </summary>
         /// <returns></returns>
-        public static float GetCpuUse()
-        { 
-            return _oPerformanceCounter.NextValue();
+        public static double GetAppCpuUse()
+        {
+            double num3 = Math.Round(currentProcess.UserProcessorTime.TotalMilliseconds / currentProcess.TotalProcessorTime.TotalMilliseconds, 2);
+
+            return num3;
         }
 
         /// <summary>
@@ -61,25 +87,25 @@ namespace Medivh.DataStorage.SystemData
         /// <returns></returns>
         public static ulong TotalPhysicalMemory()
         {
-            return ci.TotalPhysicalMemory/1024/1024;
+            return ci.TotalPhysicalMemory / 1024 / 1024;
         }
 
         /// <summary>
         /// 总虚拟内存
         /// </summary>
         /// <returns></returns>
-        public static ulong  TotalVirtualMemory()
+        public static ulong TotalVirtualMemory()
         {
-            return ci.TotalVirtualMemory/1024/1024;
+            return ci.TotalVirtualMemory / 1024 / 1024;
         }
 
         /// <summary>
         /// 可用物理内存
         /// </summary>
         /// <returns></returns>
-        public static ulong  AvailablePhysicalMemory()
+        public static ulong AvailablePhysicalMemory()
         {
-            return ci.AvailablePhysicalMemory/1024/1024;
+            return ci.AvailablePhysicalMemory / 1024 / 1024;
         }
 
         /// <summary>
@@ -88,7 +114,7 @@ namespace Medivh.DataStorage.SystemData
         /// <returns></returns>
         public static ulong AvailableVirtualMemory()
         {
-            return ci.AvailableVirtualMemory/1024/1024;
+            return ci.AvailableVirtualMemory / 1024 / 1024;
         }
 
         /// <summary>
@@ -97,7 +123,7 @@ namespace Medivh.DataStorage.SystemData
         /// <returns></returns>
         public static long PrivatePhysicalMemory()
         {
-            return currentProcess.PrivateMemorySize64/1024/1024;
+            return currentProcess.PrivateMemorySize64 / 1024 / 1024;
         }
 
         /// <summary>

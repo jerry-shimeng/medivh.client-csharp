@@ -38,7 +38,7 @@ namespace Medivh.DataStorage.OnceData.Counter
             var slist = list.Select(x => x.Mark).Distinct().ToList();
             if (slist.Count == 0)
             {
-                return null;
+                return new List<BaseModel>();
             }
             return slist.Select(s => new BaseModel() {Mark = s}).ToList();
         }

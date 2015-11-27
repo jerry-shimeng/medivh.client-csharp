@@ -35,7 +35,7 @@ namespace Medivh.Command
                     var r = ProcessCmd(model);
                     if (r == null)
                     {
-                        return Encoding.UTF8.GetBytes("o\n");
+                        return Encoding.UTF8.GetBytes("have error\n");
                     }
                     var json = Newtonsoft.Json.JsonConvert.SerializeObject(r);
                     
@@ -53,28 +53,35 @@ namespace Medivh.Command
         {
             object obj = null;
 
-            switch (model.ModuleType)
+            try
             {
-                case ModuleTypeEnum.OnceData:
-                    if (model.Operate == "clear")
-                    {
-                        OnceDataStorage.DelData(model);
-                        obj = "exec is ok";
-                    }
-                    else
-                    {
-                        obj = OnceDataStorage.GetData(model);
-                    }
-                    break;
-                case ModuleTypeEnum.StatusData:
-                    break;
-                case ModuleTypeEnum.SystemData:
-                    obj = SystemDataStorage.GetSystemInfo();
-                    break;
-                case ModuleTypeEnum.TransactionData:
-                    break;
-                default:
-                    break;
+                switch (model.ModuleType)
+                {
+                    case ModuleTypeEnum.OnceData:
+                        if (model.Operate == "clear")
+                        {
+                            OnceDataStorage.DelData(model);
+                            obj = "exec is ok";
+                        }
+                        else
+                        {
+                            obj = OnceDataStorage.GetData(model);
+                        }
+                        break;
+                    case ModuleTypeEnum.StatusData:
+                        break;
+                    case ModuleTypeEnum.SystemData:
+                        obj = SystemDataStorage.GetSystemInfo();
+                        break;
+                    case ModuleTypeEnum.TransactionData:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error(ex);
             }
 
             return obj;

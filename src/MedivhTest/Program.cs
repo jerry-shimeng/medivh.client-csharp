@@ -15,7 +15,7 @@ namespace MedivhTest
 
             MedivhSdk.Init(new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = Guid.NewGuid().ToString() }, "127.0.0.1", 5000);
 
-            Test();
+           // Test();
             Console.WriteLine("over");
             Console.ReadKey();
         }
@@ -40,7 +40,7 @@ namespace MedivhTest
                 }
                 MedivhSdk.OnceCounter.BusinessCounter("test", a.ToString(), 1, i * 2 % a);
 
-                MedivhSdk.OnceCounter.CustomCounter("apicall" + i % 5, i * 2 % a, 1, "notify", "error");
+                MedivhSdk.OnceCounter.CustomCounter("mq send succeess" + i % 5, i * 2 % a, 1, "notify", "error");
             }
 
         }

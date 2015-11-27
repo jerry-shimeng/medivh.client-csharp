@@ -31,18 +31,26 @@ namespace Medivh
         public static void Init(ClientInfo info, string ip, int port)
         {
             LogHelper.Info("Medivh starting！");
-
-            string json = String.Empty;
-            if (info != null)
+            try
             {
-                json = Newtonsoft.Json.JsonConvert.SerializeObject(info);
+                OnceCounter = new CounterClass();
+
+                string json = String.Empty;
+                if (info != null)
+                {
+                    json = Newtonsoft.Json.JsonConvert.SerializeObject(info);
+                }
+
+                Task.Run(() => { new Client().Run(ip, port, json); });
+
+                LogHelper.Info("Medivh success！");
             }
-
-            Task.Run(() => { new Client().Run(ip, port, json); });
-
-            LogHelper.Info("Medivh success！");
-
-            OnceCounter = new CounterClass();
+            catch (Exception ex)
+            {
+                LogHelper.Error(ex);
+                LogHelper.Info("Medivh error！");
+            }
+            
         }
 
         public static void Init(MedivhConfig config)

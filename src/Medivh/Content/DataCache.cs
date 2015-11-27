@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Medivh.Common;
+using Medivh.Logger;
 using Medivh.Models;
 
 namespace Medivh.Content
@@ -63,12 +65,29 @@ namespace Medivh.Content
                         AddCounter(model);
                         break;
                 }
+
+                //检测第一条数据是否超过一个月
+                if (list.Count > 0)
+                {
+                    try
+                    {
+                        if (list[0].CreateTime > DateTime.UtcNow.Unix())
+                        {
+                            list.RemoveAt(0);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error(ex);
+                    }
+                }
+
             }
 
             private void AddCounter(BaseModel model)
             {
                 list.Add(model);
-                
+
             }
 
         }

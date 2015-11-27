@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Microsoft.VisualBasic;
 
 namespace Medivh.Logger
@@ -62,8 +63,14 @@ namespace Medivh.Logger
         {
             if (ex != null)
             {
-                var msg = ex.Message + "  -  " + ex.StackTrace;
-                Error(msg);
+                StringBuilder sb = new StringBuilder();
+                sb.Append(ex.Message).Append(ex.Data).Append(ex.Source).Append(ex.StackTrace);
+
+                Error(sb.ToString());
+                if (ex.InnerException != null)
+                {
+                    Error(ex.InnerException);
+                }
             }
         }
     }

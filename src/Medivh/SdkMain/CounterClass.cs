@@ -54,7 +54,7 @@ namespace Medivh.SdkMain
         /// <summary>
         /// 自定义计数器
         /// </summary>
-        /// <param name="mark"></param>
+        /// <param name="mark">数据类型</param>
         /// <param name="level"></param>
         /// <param name="num"></param>
         /// <param name="s"></param>
