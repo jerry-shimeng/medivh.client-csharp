@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Threading.Tasks;
 using Medivh.Config;
+using Medivh.DataStorage.HeartBeatData;
 using Medivh.Logger;
 using Medivh.Models;
 using Medivh.Network;
@@ -23,7 +24,12 @@ namespace Medivh
         /// <summary>
         /// 类型计数器
         /// </summary>
-        public static CounterClass OnceCounter { get; set; }
+        public static CounterStorageMain OnceCounter { get; set; }
+
+        /// <summary>
+        /// 心跳数据
+        /// </summary>
+        public static HeartBeatStorageMain HeartBeat { get; set; }
 
         /// <summary>
         /// 初始化
@@ -33,7 +39,7 @@ namespace Medivh
             LogHelper.Info("Medivh starting！");
             try
             {
-                OnceCounter = new CounterClass();
+                Init();
 
                 string json = String.Empty;
                 if (info != null)
@@ -52,7 +58,10 @@ namespace Medivh
             }
             
         }
-
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="config"></param>
         public static void Init(MedivhConfig config)
         {
             if (config == null)
@@ -60,6 +69,14 @@ namespace Medivh
                 throw new Exception("param config is null");
             }
             Init(config.Client, config.ServerIp, config.ServerPort);
+        }
+
+        private static void Init()
+        {
+            OnceCounter = new CounterStorageMain();
+            HeartBeat = new HeartBeatStorageMain();
+
+         
         }
     }
 }

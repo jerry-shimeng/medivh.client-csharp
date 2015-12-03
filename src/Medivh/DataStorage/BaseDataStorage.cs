@@ -34,6 +34,10 @@ namespace Medivh.DataStorage
         }
 
 
-        public abstract void Clear();
+        public abstract object Clear();
+
+        public abstract object ExecCmd(CmdModel model);
+
+        
     }
 }

@@ -19,6 +19,9 @@ namespace Medivh.Content
         {
             if (model != null)
             {
+                //所有输入参数过滤掉\n
+                model.Check();
+
                 cache.Set(model);
             }
         }
@@ -31,9 +34,10 @@ namespace Medivh.Content
             }
             return cache.Get(match);
         }
-        internal void Clear()
+        internal object Clear()
         {
             cache.Clear();
+            return "clear is ok!";
         }
 
         internal List<BaseModel> GetAll()
@@ -41,9 +45,14 @@ namespace Medivh.Content
             return cache.GetAll();
         }
 
+        internal int Count()
+        {
+            return cache.GetAll().Count;
+        }
+
         private class Cache
         {
-            private List<BaseModel> list = new List<BaseModel>();
+            private volatile List<BaseModel> list = new List<BaseModel>();
             public IList<BaseModel> Get(Predicate<BaseModel> match)
             {
                 return list.FindAll(match);
@@ -64,6 +73,12 @@ namespace Medivh.Content
                     case ModuleTypeEnum.OnceData:
                         AddCounter(model);
                         break;
+                    case ModuleTypeEnum.HeartBeatData:
+                        AddData(model);
+                        break;
+                    default:
+                        AddData(model);
+                        break;
                 }
 
                 //检测第一条数据是否超过一个月
@@ -82,6 +97,11 @@ namespace Medivh.Content
                     }
                 }
 
+            }
+
+            private void AddData(BaseModel model)
+            {
+                 list.Add(model);
             }
 
             private void AddCounter(BaseModel model)

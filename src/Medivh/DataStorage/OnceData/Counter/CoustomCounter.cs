@@ -34,7 +34,7 @@ namespace Medivh.DataStorage.OnceData.Counter
 
         private IList<BaseModel> GetTypes()
         {
-            var list = cache.GetAll();
+            var list = cache.GetAll().ToList();
             var slist = list.Select(x => x.Mark).Distinct().ToList();
             if (slist.Count == 0)
             {
@@ -43,9 +43,9 @@ namespace Medivh.DataStorage.OnceData.Counter
             return slist.Select(s => new BaseModel() {Mark = s}).ToList();
         }
 
-        public override void Clear()
+        public override object Clear()
         {
-            cache.Clear();
+           return cache.Clear(); 
         }
     }
 }

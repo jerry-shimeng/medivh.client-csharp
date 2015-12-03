@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Medivh.Common;
+using Medivh.DataStorage.HeartBeatData;
 using Medivh.DataStorage.OnceData;
 using Medivh.DataStorage.SystemData;
 using Medivh.Logger;
@@ -58,17 +59,10 @@ namespace Medivh.Command
                 switch (model.ModuleType)
                 {
                     case ModuleTypeEnum.OnceData:
-                        if (model.Operate == "clear")
-                        {
-                            OnceDataStorage.DelData(model);
-                            obj = "exec is ok";
-                        }
-                        else
-                        {
-                            obj = OnceDataStorage.GetData(model);
-                        }
+                        return OnceDataStorage.Instance(model).ExecCmd(model);
                         break;
-                    case ModuleTypeEnum.StatusData:
+                    case ModuleTypeEnum.HeartBeatData:
+                        return HeartBeatDataStorage.Instance().ExecCmd(model);
                         break;
                     case ModuleTypeEnum.SystemData:
                         obj = SystemDataStorage.GetSystemInfo();

@@ -13,9 +13,9 @@ namespace MedivhTest
         {
             MedivhSdk.SetLogger(Log);
 
-            MedivhSdk.Init(new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = Guid.NewGuid().ToString() }, "127.0.0.1", 5000);
+            MedivhSdk.Init(new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = "aaaaaaaaaaaaaaaaaa" }, "192.168.155.239", 5000);
 
-           // Test();
+            Test();
             Console.WriteLine("over");
             Console.ReadKey();
         }
@@ -41,6 +41,8 @@ namespace MedivhTest
                 MedivhSdk.OnceCounter.BusinessCounter("test", a.ToString(), 1, i * 2 % a);
 
                 MedivhSdk.OnceCounter.CustomCounter("mq send succeess" + i % 5, i * 2 % a, 1, "notify", "error");
+
+                MedivhSdk.HeartBeat.Add(new HeartBeatModel() { Mark = "test" + i % 5, Level = i * 2 % a, Action = Action });
             }
 
         }
@@ -84,6 +86,12 @@ namespace MedivhTest
                     throw new MyEx59();
             }
 
+        }
+
+
+        static object Action()
+        {
+            return new { code = 0, data = DateTime.Now };
         }
 
         static void Log(string msg)

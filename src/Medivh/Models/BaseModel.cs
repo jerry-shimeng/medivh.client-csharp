@@ -7,15 +7,8 @@ namespace Medivh.Models
 {
     public class BaseModel
     {
-        Random random = new Random();
         public BaseModel()
         {
-            //注释部分为测试代码
-            //Thread.Sleep(10);
-           // var date = random.Next(240);
-            //this.CreateTime = DateTime.UtcNow.AddHours(-1 * date).Unix();
-            //Console.WriteLine(date);
-            
             this.CreateTime = DateTime.UtcNow.Unix();
         }
         public ModuleTypeEnum ModuleType { get; set; }
@@ -26,5 +19,42 @@ namespace Medivh.Models
         public List<string> Other { get; set; }
         public long CreateTime { get; set; }
         public int Level { get; set; }
+        public object Result { get; set; }
+        public double RunTime { get; set; }
+
+        internal void Check()
+        {
+            //检测替换用户输入文字中的\n
+            if (!string.IsNullOrWhiteSpace(this.Mark))
+            {
+                this.Mark = this.Mark.Replace("\n", " ");
+            }
+            if (!string.IsNullOrWhiteSpace(this.Alias))
+            {
+                this.Alias = this.Alias.Replace("\n", " ");
+            }
+
+            if (this.Other != null && this.Other.Count > 0)
+            {
+                for (int i = 0; i < Other.Count; i++)
+                {
+                    if (Other[i].IndexOf("\n", StringComparison.Ordinal) >= 0)
+                    {
+                        Other[i] = Other[i].Replace("\n", " ");
+                    }
+                }
+            }
+
+            //result 中\n替换
+            if (Result != null)
+            {
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(Result);
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    json = json.Replace("\n", " ");
+                    this.Result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                }
+            }
+        }
     }
 }

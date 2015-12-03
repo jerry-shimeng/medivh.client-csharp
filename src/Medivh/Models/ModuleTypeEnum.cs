@@ -16,7 +16,7 @@
         /// <summary>
         /// 心跳数据
         /// </summary>
-        StatusData = 3,
+        HeartBeatData = 3,
         /// <summary>
         /// 事务数据
         /// </summary>

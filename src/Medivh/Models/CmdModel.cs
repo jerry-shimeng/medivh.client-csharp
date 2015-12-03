@@ -17,5 +17,6 @@
         public string Alias { get; set; }
         public int Level { get; set; }
         public string Operate { get; set; }
+        public string Extend { get; set; }
     }
 }

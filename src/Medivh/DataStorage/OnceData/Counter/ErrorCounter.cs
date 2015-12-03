@@ -24,9 +24,9 @@ namespace Medivh.DataStorage.OnceData.Counter
         }
 
 
-        public override void Clear()
+        public override object Clear()
         {
-            cache.Clear();
+          return  cache.Clear(); 
         }
     }
 }

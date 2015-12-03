@@ -8,8 +8,13 @@
         public string AppName { get; set; }
 
         /// <summary>
-        /// app的key,由监控中心分配
+        /// app的public key，必须是唯一的
         /// </summary>
-        public string AppKey { get; set; } 
+        public string AppKey { get; set; }
+
+        /// <summary>
+        /// 密钥:安全验证使用
+        /// </summary>
+        public string AppSecret { get; set; }
     }
 }
