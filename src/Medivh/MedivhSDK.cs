@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading.Tasks;
+using Medivh.Common;
 using Medivh.Config;
 using Medivh.DataStorage.HeartBeatData;
 using Medivh.Logger;
@@ -44,7 +45,7 @@ namespace Medivh
                 string json = String.Empty;
                 if (info != null)
                 {
-                    json = Newtonsoft.Json.JsonConvert.SerializeObject(info);
+                    json =  (info).JsonObjectToString();
                 }
 
                 Task.Run(() => { new Client().Run(ip, port, json); });

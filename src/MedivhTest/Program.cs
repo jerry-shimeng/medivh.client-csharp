@@ -12,8 +12,9 @@ namespace MedivhTest
         static void Main(string[] args)
         {
             MedivhSdk.SetLogger(Log);
-
-            MedivhSdk.Init(new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = "aaaaaaaaaaaaaaaaaa" }, "192.168.155.239", 5000);
+           
+            MedivhSdk.Init(new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = "aaaaaaaaaaaaaaaaaa"  }, "192.168.155.239", 5000);
+           
 
             Test();
             Console.WriteLine("over");

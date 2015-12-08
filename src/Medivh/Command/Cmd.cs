@@ -38,7 +38,7 @@ namespace Medivh.Command
                     {
                         return Encoding.UTF8.GetBytes("have error\n");
                     }
-                    var json = Newtonsoft.Json.JsonConvert.SerializeObject(r);
+                    var json = r.JsonObjectToString();
                     
                     return Encoding.UTF8.GetBytes(json + "\n");
                 }

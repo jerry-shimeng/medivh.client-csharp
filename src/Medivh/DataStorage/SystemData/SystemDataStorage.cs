@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using Medivh.Common;
 using Microsoft.VisualBasic.Devices;
 
 namespace Medivh.DataStorage.SystemData
@@ -35,7 +36,7 @@ namespace Medivh.DataStorage.SystemData
 
             stringBuilder.Append("}");
             var json = (stringBuilder.ToString());
-            return Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            return json.JosnStringToObject<object>();
         }
 
         private static PerformanceCounter _oPerformanceCounter = null;

@@ -48,11 +48,11 @@ namespace Medivh.Models
             //result 中\n替换
             if (Result != null)
             {
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(Result);
+                var json = (Result).JsonObjectToString();
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     json = json.Replace("\n", " ");
-                    this.Result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                    this.Result =  (json).JosnStringToObject<object>();
                 }
             }
         }
