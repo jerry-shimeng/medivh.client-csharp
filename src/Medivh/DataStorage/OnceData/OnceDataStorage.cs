@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Medivh.Content;
 using Medivh.DataStorage.OnceData.Counter;
 using Medivh.Models;
 
@@ -8,8 +9,8 @@ namespace Medivh.DataStorage.OnceData
     /// <summary>
     /// 
     /// </summary>
-    internal  abstract class OnceDataStorage : BaseDataStorage
-    { 
+    internal abstract class OnceDataStorage : BaseDataStorage
+    {
         public CmdModel Cmd { get; private set; }
         public static OnceDataStorage Instance(CmdModel cmd)
         {
@@ -56,7 +57,7 @@ namespace Medivh.DataStorage.OnceData
                     break;
                 case CounterTypeEnum.Error:
                     obj = new ErrorCounter();
-                    break;  
+                    break;
                 default:
                     break;
             }
@@ -87,7 +88,7 @@ namespace Medivh.DataStorage.OnceData
                     break;
                 case CounterTypeEnum.Error:
                     obj = new ErrorCounter();
-                    break; 
+                    break;
                 default:
                     break;
             }
@@ -98,7 +99,20 @@ namespace Medivh.DataStorage.OnceData
             return null;
         }
 
-        public override object Clear()
+        public override object ExecCmd(CmdModel model)
+        {
+            if (model.Operate.Equals("get_and_clear"))
+            {
+                return this.GetAndClear();
+            }
+            else
+            {
+                return this.Get(Cmd);
+            }
+        }
+
+
+        public virtual object GetAndClear()
         {
             OnceDataStorage obj = null;
 
@@ -120,21 +134,18 @@ namespace Medivh.DataStorage.OnceData
             }
             if (obj != null)
             {
-                return obj.Clear();
+                return obj.GetDataCache().GetAndClear();
             }
             return "not found";
         }
 
-        public override object ExecCmd(CmdModel model)
+
+        public override IList<BaseModel> Get(CmdModel cmd)
         {
-            if (model.Operate.Equals("clear"))
-            {
-               return this.Clear(); 
-            }
-            else
-            {
-                return this.Get(Cmd);
-            }
+            return base.Get(cmd);
         }
+
+
+        public abstract DataCache GetDataCache();
     }
 }

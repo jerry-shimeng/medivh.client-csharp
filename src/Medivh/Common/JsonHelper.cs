@@ -1,20 +1,46 @@
-﻿using System.Web.Script.Serialization;
+﻿
 
 namespace Medivh.Common
 {
     internal static class JsonHelper
     {
-        public static T JosnStringToObject<T>(this string jsonStr)
+
+        //public static Func<object, string> JsonSerializer { get; set; }
+        //public static Func<string, object> JsonDeSerializer { get; set; }
+
+
+
+        public static T JosnStringToObject<T>(string jsonStr)
         {
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            var objs = serializer.Deserialize<T>(jsonStr);
-            return objs;
+            //if (JsonDeSerializer == null)
+            //{
+            //    JavaScriptSerializer serializer = new JavaScriptSerializer();
+            //    serializer.MaxJsonLength = Int32.MaxValue;
+            //    var objs = serializer.Deserialize<object>(jsonStr);
+            //    return objs;
+            //}
+            //else
+            //{
+            //    return JsonDeSerializer(jsonStr);
+            //}
+
+            return Medivh.Json.JsonConvert.DeserializeObject<T>(jsonStr);
         }
 
-        public static string JsonObjectToString(this object obj)
+        public static string JsonObjectToString(object obj)
         {
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            return serializer.Serialize(obj);
+            //if (JsonSerializer == null)
+            //{
+            //    JavaScriptSerializer serializer = new JavaScriptSerializer();
+            //    serializer.MaxJsonLength = Int32.MaxValue;
+            //    return serializer.Serialize(obj);
+            //}
+            //else
+            //{
+            //    return JsonSerializer(obj);
+            //}
+
+            return Medivh.Json.JsonConvert.SerializeObject(obj);
         }
     }
 }

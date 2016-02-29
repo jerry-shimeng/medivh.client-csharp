@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medivh", "Medivh\Medivh.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedivhTest", "MedivhTest\MedivhTest.csproj", "{1DAD1B1D-D29C-4443-95FE-33936E40219E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{409E6EEA-0D14-4469-8646-2483AC24B498}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedivhUnitTest", "MedivhUnitTest\MedivhUnitTest.csproj", "{DA5C7E99-31FB-473E-A0E2-60C02D2A1E51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +25,15 @@ Global
 		{1DAD1B1D-D29C-4443-95FE-33936E40219E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DAD1B1D-D29C-4443-95FE-33936E40219E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DAD1B1D-D29C-4443-95FE-33936E40219E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA5C7E99-31FB-473E-A0E2-60C02D2A1E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA5C7E99-31FB-473E-A0E2-60C02D2A1E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA5C7E99-31FB-473E-A0E2-60C02D2A1E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA5C7E99-31FB-473E-A0E2-60C02D2A1E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DA5C7E99-31FB-473E-A0E2-60C02D2A1E51} = {409E6EEA-0D14-4469-8646-2483AC24B498}
 	EndGlobalSection
 EndGlobal

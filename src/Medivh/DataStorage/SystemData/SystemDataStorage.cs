@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Medivh.Common;
 using Microsoft.VisualBasic.Devices;
 
@@ -12,6 +14,29 @@ namespace Medivh.DataStorage.SystemData
         static Process currentProcess = Process.GetCurrentProcess();
         static ComputerInfo ci = new ComputerInfo();
 
+        private static double cpuUsed = 0;
+
+        static SystemDataStorage()
+        { 
+            Task.Run(() =>
+            {
+                //间隔时间（毫秒）
+                int interval = 1000;
+                //上次记录的CPU时间
+                var prevCpuTime = TimeSpan.Zero;
+                while (true)
+                {
+                    //当前时间
+                    var curTime = currentProcess.TotalProcessorTime;
+                    //间隔时间内的CPU运行时间除以逻辑CPU数量
+                    var value = (curTime - prevCpuTime).TotalMilliseconds / interval / Environment.ProcessorCount * 100;
+                    prevCpuTime = curTime;
+                    //输出 
+                    cpuUsed = value; 
+                    Thread.Sleep(interval);
+                }
+            });
+        }
         /// <summary>
         /// 获取系统信息
         /// </summary>
@@ -30,13 +55,13 @@ namespace Medivh.DataStorage.SystemData
             stringBuilder.AppendFormat("\"AvailableVirtualMemory\":{0},", AvailableVirtualMemory());
             stringBuilder.AppendFormat("\"PrivatePhysicalMemory\":{0},", PrivatePhysicalMemory());
             stringBuilder.AppendFormat("\"CpuNum\":{0},", GetCpuNumber());
-            stringBuilder.AppendFormat("\"Cpu\":{0},", GetCpuUse());
+            //stringBuilder.AppendFormat("\"Cpu\":{0},", GetCpuUse());
             stringBuilder.AppendFormat("\"AppCpu\":{0},", GetAppCpuUse());
             stringBuilder.AppendFormat("\"StartTime\":\"{0}\"", StartTime());
 
             stringBuilder.Append("}");
             var json = (stringBuilder.ToString());
-            return json.JosnStringToObject<object>();
+            return JsonHelper.JosnStringToObject<object>(json);
         }
 
         private static PerformanceCounter _oPerformanceCounter = null;
@@ -67,11 +92,12 @@ namespace Medivh.DataStorage.SystemData
         /// </summary>
         /// <returns></returns>
         public static double GetAppCpuUse()
-        {
-            double num3 = Math.Round(currentProcess.UserProcessorTime.TotalMilliseconds / currentProcess.TotalProcessorTime.TotalMilliseconds, 2);
-
-            return num3;
+        { 
+            return cpuUsed;
         }
+
+
+
 
         /// <summary>
         /// 获取cpu数量

@@ -11,7 +11,7 @@ namespace Medivh.DataStorage.HeartBeatData
     internal class HeartBeatDataStorage : BaseDataStorage
     {
         static HeartBeatDataStorage storage = new HeartBeatDataStorage();
-
+        static List<BaseModel> cache = new List<BaseModel>(); 
         private HeartBeatDataStorage()
         {
 
@@ -19,9 +19,7 @@ namespace Medivh.DataStorage.HeartBeatData
         public static HeartBeatDataStorage Instance()
         {
             return storage;
-        }
-
-        private static DataCache cache = new DataCache();
+        } 
         public override void Add(BaseModel model)
         {
             cache.Add(model);
@@ -29,27 +27,19 @@ namespace Medivh.DataStorage.HeartBeatData
 
         public override IList<BaseModel> Get(Predicate<BaseModel> match)
         {
-            return cache.Get(match);
+            return cache.FindAll(match);
         }
-
-        public override object Clear()
-        {
-            return cache.Clear();
-        }
-
+         
         public override object ExecCmd(CmdModel model)
         {
-            if (model.Operate.Equals("clear"))
-            {
-                return Clear();
-            }
-            else if (model.Operate.Equals("types"))
+             
+             if (model.Operate.Equals("types"))
             {
                 return GetTypes();
             }
             else if (model.Operate.Equals("level"))
             {
-                return GetLevel();
+                return GetLevel(model.Mark);
             }
             else if (model.Operate.Equals("period"))
             {
@@ -78,9 +68,9 @@ namespace Medivh.DataStorage.HeartBeatData
             }
         }
 
-        private IList<BaseModel> GetLevel()
+        private IList<BaseModel> GetLevel(string mark)
         {
-            var list = cache.GetAll().ToList();
+            var list = cache;
             var slist = list.Select(x => x.Level).Distinct().ToList();
             if (slist.Count == 0)
             {
@@ -91,13 +81,45 @@ namespace Medivh.DataStorage.HeartBeatData
 
         private IList<BaseModel> GetTypes()
         {
-            var list = cache.GetAll().ToList();
+            var list = cache;
             var slist = list.Select(x => x.Mark).Distinct().ToList();
             if (slist.Count == 0)
             {
                 return new List<BaseModel>();
             }
             return slist.Select(s => new BaseModel() { Mark = s }).ToList();
+        }
+
+        /// <summary>
+        /// 心跳数据组合
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        public override IList<BaseModel> Get(CmdModel cmd)
+        {
+            Predicate<BaseModel> match = null;
+            if (string.IsNullOrWhiteSpace(cmd.Mark) )
+            { 
+                match = cmd.Level == 0 ? new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType) : new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType && x.Level == cmd.Level);
+            }
+            else if (!string.IsNullOrWhiteSpace(cmd.Mark))
+            {
+                match = cmd.Level == 0 ? new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType && x.Mark == (cmd.Mark)) : new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType && x.Level == cmd.Level && x.Mark == (cmd.Mark));
+            }
+            else if (string.IsNullOrWhiteSpace(cmd.Mark))
+            {
+                match = cmd.Level == 0 ? match = new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType) : match = new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType && x.Level == cmd.Level );
+            }
+            else
+            {
+                match = cmd.Level == 0 ? match = new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType && x.Mark == (cmd.Mark)) : match = new Predicate<BaseModel>(x => x.ModuleType == cmd.ModuleType && x.Level == cmd.Level  && x.Mark == (cmd.Mark));
+            }
+            return Get(match);
+        }
+
+        public void Clear()
+        {
+            cache.Clear();
         }
     }
 }

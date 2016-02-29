@@ -11,7 +11,7 @@ namespace Medivh.DataStorage.OnceData.Counter
     /// </summary>
     internal class ErrorCounter : OnceDataStorage
     {
-        private static DataCache cache = new DataCache();
+        private static DataCache cache = new DataCache(ModuleTypeEnum.OnceData, CounterTypeEnum.Error);
         public override void Add(BaseModel model)
         {
             model.Count = 1;
@@ -23,10 +23,10 @@ namespace Medivh.DataStorage.OnceData.Counter
             return cache.Get(match);
         }
 
-
-        public override object Clear()
+         
+        public override DataCache GetDataCache()
         {
-          return  cache.Clear(); 
+            return cache;
         }
     }
 }

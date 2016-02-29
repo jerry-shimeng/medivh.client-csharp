@@ -5,125 +5,175 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Medivh.Command;
+using Medivh.Config;
 using Medivh.Logger;
 
 namespace Medivh.Network
 {
+    /// <summary>
+    /// 心跳数据是 0\n
+    /// 所有数据传输结尾都使用 \n 所以消息体内避免使用\n
+    /// </summary>
     internal class Client
     {
-        private static int count = 0;
 
-        private Socket _socket = null;
-        string _ip = String.Empty;
-        private int _port = 0;
-        string _info =String.Empty;
-        public void Run(string ip, int port, string info)
+        private Socket socket = null;
+        string ip = String.Empty;
+        private int port = 0;
+        string info = String.Empty;
+        public bool RunAync(string _ip, int _port, string _info)
         {
+            ip = _ip;
+            port = _port;
+            info = _info;
+
             if (string.IsNullOrWhiteSpace(ip) || string.IsNullOrWhiteSpace(info) || port <= 0)
             {
-                LogHelper.Error("网络模块初始化异常，请检查参数:ip port clientinfo");
-                return;
+                LogHelper.Error("init error，please check the params :ip port clientinfo");
+                return false;
             }
 
-            _ip = ip;
-            _port = port;
-            _info = info;
+            ConnectionServer();
+            //开启心跳
+            HeartBeatAsnyc();
 
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            return true;
+        }
+
+        private void ConnectionServer()
+        {
+
+
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             byte[] buffer = new byte[1024 * 1024];
             int len = 0;
             try
             {
-                _socket.Connect(IPAddress.Parse(ip), port);
-                LogHelper.Info("连接服务器成功！" + count++);
+                socket.Connect(IPAddress.Parse(ip), port);
+                LogHelper.Info("connection service success！");
+
                 //socket.Send(Encoding.UTF8.GetBytes("hello world!\n"));
                 //发送消息
-                _socket.Send(Encoding.UTF8.GetBytes(info + "\n"));
-                HeartBeatAsnyc();
-                Process(_socket, buffer);
+                socket.Send(Encoding.UTF8.GetBytes(info + "\n"));
+
+                //连接处理
+                ProcessAync(socket, buffer);
+
+                MedivhConfig.ResetConnectionInterval();
+
             }
             catch (SocketException ex)
             {
-                ReConnection();
+                LogHelper.Error(ex);
+                MedivhConfig.ConnectionInterval += 1;
             }
-
         }
 
-        private static void Process(Socket socket, byte[] b)
+        private static void ProcessAync(Socket socket, byte[] b)
         {
-            int len = 0;
-            while (true)
+            Task.Run(() =>
             {
-                len = socket.Receive(b);
-                if (len == 0)
+                int len = 0;
+                while (true)
                 {
-                    throw new SocketException(-1);
-                }
-                if (len <= 2)
-                {
-                    //反馈消息，不处理
-                }else if (len == 4)
-                {
-                    //结束信号
-                    throw new SocketException(-1);
-                }
-                else
-                {
-
-                    byte[] buffer = null;
-
-                    //消息处理
-                    try
+                    len = socket.Receive(b);
+                    if (len == 0)
                     {
-                        buffer = Cmd.ProcessCmd(b, len);
+                        throw new SocketException(-1);
                     }
-                    catch (Exception ex)
+                    if (len <= 2)
                     {
-                        buffer = Encoding.UTF8.GetBytes("[Exception]" + ex.Message + "\n");
+                        //心跳消息包，不处理
                     }
-
-                    if (buffer != null)
+                    else if (len == 4)
                     {
-                        socket.Send(buffer);
+                        //结束信号
+                        throw new SocketException(-1);
                     }
                     else
                     {
-                        socket.Send(Encoding.UTF8.GetBytes("cmd exec error\n"));
-                    }
-                }
-                Array.Clear(b, 0, len);
-            }
-        }
 
-        private  void ReConnection()
-        {
-            LogHelper.Info("连接服务器异常,5秒后重试");
-            _socket.Close();
-            _socket.Dispose();
-            Thread.Sleep(5000);
-            Run(_ip, _port, _info);
-        }
-
-        private void HeartBeatAsnyc()
-        {
-            if (_socket!=null && _socket.Connected == true)
-            {
-                Task.Run(() =>
-                {
-                    while (true)
-                    {
+                        byte[] buffer = null;
                         try
                         {
-                            if (_socket != null && _socket.Connected == true)
-                                _socket.Send(Encoding.UTF8.GetBytes("0\n"));
+
+                            //消息处理
+                            try
+                            {
+                                buffer = Cmd.ProcessCmd(b, len);
+                            }
+                            catch (Exception ex)
+                            {
+                                buffer = Encoding.UTF8.GetBytes("[Exception]" + ex.Message + "\n");
+                            }
+
+                            if (buffer != null)
+                            {
+                                socket.Send(buffer);
+                            }
+                            else
+                            {
+                                socket.Send(Encoding.UTF8.GetBytes("cmd exec error\n"));
+                            }
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error(ex);
+                            LogHelper.Error(ex, "send resultset error");
+                            if (buffer != null)
+                                LogHelper.Info(String.Format("[resultset]   {0}", Encoding.UTF8.GetString(buffer)));
                         }
-                        Thread.Sleep(5 * 1000); 
                     }
-                });
+                    Array.Clear(b, 0, len);
+                }
+
+            });
+        }
+
+        private void ReConnection()
+        {
+            LogHelper.Info(string.Format("reconnection service , interval {0} seconds", MedivhConfig.ConnectionInterval));
+            socket.Close();
+            socket.Dispose();
+            ConnectionServer();
+        }
+
+        //        private System.Threading.Timer timersTimer;
+        private void HeartBeatAsnyc()
+        { 
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(MedivhConfig.ConnectionInterval * 1000);
+                    TimerElapsed();
+                }
+            });
+        }
+
+        private int lastTime = MedivhConfig.ConnectionInterval;
+        void TimerElapsed()
+        {
+            try
+            {
+                if (socket != null && socket.Connected == true)
+                {
+                    socket.Send(Encoding.UTF8.GetBytes("0\n"));
+                }
+                else
+                {
+                    ReConnection();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error(ex);
+            }
+            finally
+            {
+                if (lastTime != MedivhConfig.ConnectionInterval)
+                {
+                    //                    timersTimer.Change(MedivhConfig.ConnectionInterval * 1000, MedivhConfig.ConnectionInterval * 1000);
+                }
             }
         }
     }

@@ -15,7 +15,7 @@ namespace Medivh.SdkMain
         /// <param name="ex"></param>
         /// <param name="num"></param>
         /// <param name="level"></param>
-        public void ErrorCounter(string mark, Exception ex, int num = 1, int level = 0)
+        public void ErrorCounter(Exception ex, int num = 1, int level = 0)
         {
             if (ex == null)
             {
@@ -23,7 +23,7 @@ namespace Medivh.SdkMain
             }
             try
             {
-                SaveCounter(mark, CounterTypeEnum.Error, ex.GetType().FullName, num, level);
+                SaveCounter(ex.GetType().FullName, CounterTypeEnum.Error, num, level);
             }
             catch (Exception ex1)
             {
@@ -39,11 +39,11 @@ namespace Medivh.SdkMain
         /// <param name="busName"></param>
         /// <param name="num"></param>
         /// <param name="level"></param>
-        public void BusinessCounter(string mark, string busName, int num = 1, int level = 0)
+        public void BusinessCounter(string busName, int num = 1, int level = 0)
         {
             try
             {
-                SaveCounter(mark, CounterTypeEnum.Business, busName, num, level);
+                SaveCounter(busName, CounterTypeEnum.Business,  num, level);
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ namespace Medivh.SdkMain
         {
             try
             {
-                SaveCounter(mark, CounterTypeEnum.Custom, null, num, level);
+                SaveCounter(mark, CounterTypeEnum.Custom, num, level);
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace Medivh.SdkMain
         }
 
          
-        public void SaveCounter(string mark, CounterTypeEnum ct, string alias, int num, int level)
+        private void SaveCounter(string mark, CounterTypeEnum ct, int num, int level)
         {
             num = num >= 0 ? 1 : num;
             level = level <= 0 ? 0 : level;
@@ -79,7 +79,6 @@ namespace Medivh.SdkMain
             BaseModel model = new BaseModel()
             {
                 ModuleType = ModuleTypeEnum.OnceData,
-                Alias = alias,
                 Count = num,
                 Level = level,
                 CounterType = ct,

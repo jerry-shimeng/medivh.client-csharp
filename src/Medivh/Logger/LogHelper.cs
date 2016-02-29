@@ -17,7 +17,7 @@ namespace Medivh.Logger
 
         public static void Info(string msg)
         {
-            msg = "[INFO] " + msg;
+            msg = string.Format("[Info]:{0} ", msg);
             if (Logger != null)
             {
                 Logger(msg);
@@ -30,7 +30,7 @@ namespace Medivh.Logger
 
         public static void Error(string msg)
         {
-            msg = "[Error] " + msg;
+            msg = string.Format("[Error]:{0} ", msg);
             if (Logger != null)
             {
                 Logger(msg);
@@ -47,7 +47,7 @@ namespace Medivh.Logger
             {
                 return;
             }
-            msg = "[Debug] " + msg;
+            msg = string.Format("[Debug]:{0} ", msg);
             if (Logger != null)
             {
                 Logger(msg);
@@ -59,12 +59,12 @@ namespace Medivh.Logger
 
         }
 
-        public static void Error(Exception ex)
+        public static void Error(Exception ex, string msg = "")
         {
             if (ex != null)
             {
                 StringBuilder sb = new StringBuilder();
-                sb.Append(ex.Message).Append(ex.Data).Append(ex.Source).Append(ex.StackTrace);
+                sb = sb.Append(string.Format("{0}\n{1}\n", msg, ex.Message)).Append(ex.Data).Append(ex.Source).Append(ex.StackTrace);
 
                 Error(sb.ToString());
                 if (ex.InnerException != null)
@@ -73,5 +73,7 @@ namespace Medivh.Logger
                 }
             }
         }
+
+
     }
 }

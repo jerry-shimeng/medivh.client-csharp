@@ -13,8 +13,7 @@
         /// 1err 2object 3business 4custom
         /// </summary>
         public CounterTypeEnum CounterType { get; set; } 
-        public string Mark { get; set; } 
-        public string Alias { get; set; }
+        public string Mark { get; set; }  
         public int Level { get; set; }
         public string Operate { get; set; }
         public string Extend { get; set; }

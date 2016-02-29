@@ -1,115 +1,158 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Medivh.Common;
 using Medivh.Logger;
 using Medivh.Models;
+using Timer = System.Timers.Timer;
 
 namespace Medivh.Content
 {
     /// <summary>
     /// 数据存储的结构
+    /// 获取数据单次有上限，上限为1000条
     /// </summary>
-    internal class DataCache
+    public class DataCache
     {
-        Cache cache = new Cache();
+        public ModuleTypeEnum ModuleType { get; set; }
+        public CounterTypeEnum CounterType { get; set; }
+        public DataCache(ModuleTypeEnum module, CounterTypeEnum counter)
+        {
+            this.ModuleType = module;
+            this.CounterType = counter;
+            //启动数据整合 ，根据分钟整合
+            AddByCondense();
+        }
+
+        private ConcurrentQueue<BaseModel> dataQueue = new ConcurrentQueue<BaseModel>();
+        private int maxLength = 200;
+        /// <summary>
+        /// 添加数据
+        /// 添加的数据如果超过设置的最大数量，则压缩数据，压缩方式是已小时为单位，合并现有数据
+        /// </summary>
+        /// <param name="model"></param>
         internal void Add(BaseModel model)
         {
             if (model != null)
             {
-                //所有输入参数过滤掉\n
-                model.Check();
-
-                cache.Set(model);
+                AddQueue(model);
             }
         }
 
+        internal void AddQueue(BaseModel model)
+        {
+            dataQueue.Enqueue(model);
+        }
+
+        /// <summary>
+        /// 压缩数据的方式添加
+        /// </summary>
+        /// <param name="model"></param>
+        internal void AddByCondense()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    BaseModel model;
+                    if (GetOne(out model))
+                    {
+                        CacheCenter.Set(model);
+                    }
+                    else
+                    {
+                        Thread.Sleep(50);
+                    }
+                }
+            });
+
+
+
+            //if (model != null)
+            //{
+            //    model = ConvertObjectTime(model);
+
+            //    var obj = dataQueue.ToList()
+            //        .FirstOrDefault(
+            //            temp =>
+            //                temp.CreateTime == model.CreateTime && temp.Mark.Equals(model.Mark) &&
+            //                temp.Level == model.Level &&
+            //                temp.ModuleType == model.ModuleType && temp.CounterType == model.CounterType &&
+            //                temp.Result == model.Result);
+
+            //    if (obj != null)
+            //    {
+            //        obj.Count += model.Count;
+            //    }
+            //    else
+            //    {
+            //        AddQueue(model);
+            //    }
+            //}
+        }
+
+
+        #region 普通操作
+
+        /// <summary>
+        /// 废弃
+        /// </summary>
+        /// <param name="match"></param>
+        /// <returns></returns>
         internal IList<BaseModel> Get(Predicate<BaseModel> match)
         {
-            if (match == null)
-            {
-                return null;
-            }
-            return cache.Get(match);
-        }
-        internal object Clear()
-        {
-            cache.Clear();
-            return "clear is ok!";
+            return CacheCenter.Get(match);
+            //if (match == null)
+            //{
+            //    return null;
+            //}
+            //return dataQueue.ToList().FindAll(match);
         }
 
+        /// <summary>
+        /// 获取并清空当前列表
+        /// 最大获取200条数据
+        /// </summary>
+        /// <returns></returns>
+        internal object GetAndClear()
+        {
+            return CacheCenter.GetAndClear(this.ModuleType, this.CounterType);
+        }
+
+        /// <summary>
+        /// 废弃
+        /// </summary>
+        /// <returns></returns>
         internal List<BaseModel> GetAll()
         {
-            return cache.GetAll();
+            return null;
         }
 
-        internal int Count()
+        internal bool GetOne(out BaseModel model)
         {
-            return cache.GetAll().Count;
+            if (dataQueue.IsEmpty)
+            {
+                model = null;
+                return false;
+            }
+
+            return dataQueue.TryDequeue(out model);
         }
 
-        private class Cache
+        internal void Clear()
         {
-            private volatile List<BaseModel> list = new List<BaseModel>();
-            public IList<BaseModel> Get(Predicate<BaseModel> match)
+            BaseModel item;
+            while (dataQueue.TryDequeue(out item))
             {
-                return list.FindAll(match);
+                // do nothing
             }
-            public void Clear()
-            {
-                list.Clear();
-            }
-
-            public List<BaseModel> GetAll()
-            {
-                return list;
-            }
-            public void Set(BaseModel model)
-            {
-                switch (model.ModuleType)
-                {
-                    case ModuleTypeEnum.OnceData:
-                        AddCounter(model);
-                        break;
-                    case ModuleTypeEnum.HeartBeatData:
-                        AddData(model);
-                        break;
-                    default:
-                        AddData(model);
-                        break;
-                }
-
-                //检测第一条数据是否超过一个月
-                if (list.Count > 0)
-                {
-                    try
-                    {
-                        if (list[0].CreateTime > DateTime.UtcNow.Unix())
-                        {
-                            list.RemoveAt(0);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error(ex);
-                    }
-                }
-
-            }
-
-            private void AddData(BaseModel model)
-            {
-                 list.Add(model);
-            }
-
-            private void AddCounter(BaseModel model)
-            {
-                list.Add(model);
-
-            }
-
         }
+        #endregion
+
+
     }
 }

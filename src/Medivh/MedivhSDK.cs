@@ -13,6 +13,7 @@ namespace Medivh
 {
     public class MedivhSdk
     {
+        public static ClientInfo Client { get; private set; }
         /// <summary>
         /// 设置日志记录
         /// </summary>
@@ -22,6 +23,8 @@ namespace Medivh
         {
             LogHelper.Init(action, logLevel);
         }
+ 
+
         /// <summary>
         /// 类型计数器
         /// </summary>
@@ -37,6 +40,7 @@ namespace Medivh
         /// </summary>
         public static void Init(ClientInfo info, string ip, int port)
         {
+            Client = info;
             LogHelper.Info("Medivh starting！");
             try
             {
@@ -45,10 +49,10 @@ namespace Medivh
                 string json = String.Empty;
                 if (info != null)
                 {
-                    json =  (info).JsonObjectToString();
+                    json =  JsonHelper.JsonObjectToString(info);
                 }
 
-                Task.Run(() => { new Client().Run(ip, port, json); });
+                new Client().RunAync(ip, port, json);  
 
                 LogHelper.Info("Medivh success！");
             }
@@ -57,7 +61,6 @@ namespace Medivh
                 LogHelper.Error(ex);
                 LogHelper.Info("Medivh error！");
             }
-            
         }
         /// <summary>
         /// 初始化

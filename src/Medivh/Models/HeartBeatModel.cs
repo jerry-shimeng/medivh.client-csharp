@@ -13,7 +13,7 @@ namespace Medivh.Models
         /// </summary>
         public string Mark { get; set; }
 
-        public Func<object> Action { get; set; }
+        public Func<string> Action { get; set; }
 
         public int Level { get; set; }
 

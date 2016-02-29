@@ -1,7 +1,7 @@
 ﻿namespace Medivh.Models
 {
     /// <summary>
-    /// 1一次性数据  2系统信息     3心跳数据    4事务数据
+    /// 1一次性数据  2系统信息     3心跳数据    
     /// </summary>
     public enum ModuleTypeEnum
     {
@@ -17,9 +17,9 @@
         /// 心跳数据
         /// </summary>
         HeartBeatData = 3,
-        /// <summary>
-        /// 事务数据
-        /// </summary>
-        TransactionData = 4
+        ///// <summary>
+        ///// 事务数据
+        ///// </summary>
+        //TransactionData = 4
     }
 }

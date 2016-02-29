@@ -29,8 +29,8 @@ namespace Medivh.Command
                     return new byte[] { 10 };
                 }
                 //Console.Write(msg);
-                var model = msg.JosnStringToObject<CmdModel>();
-                Console.WriteLine("[msg]" + msg);
+                var model =  JsonHelper.JosnStringToObject<CmdModel>(msg);
+                LogHelper.Debug("[msg]" + msg);
                 if (model != null)
                 {
                     var r = ProcessCmd(model);
@@ -38,7 +38,7 @@ namespace Medivh.Command
                     {
                         return Encoding.UTF8.GetBytes("have error\n");
                     }
-                    var json = r.JsonObjectToString();
+                    var json = JsonHelper.JsonObjectToString(r);
                     
                     return Encoding.UTF8.GetBytes(json + "\n");
                 }
@@ -67,8 +67,8 @@ namespace Medivh.Command
                     case ModuleTypeEnum.SystemData:
                         obj = SystemDataStorage.GetSystemInfo();
                         break;
-                    case ModuleTypeEnum.TransactionData:
-                        break;
+                    //case ModuleTypeEnum.TransactionData:
+                    //    break;
                     default:
                         break;
                 }

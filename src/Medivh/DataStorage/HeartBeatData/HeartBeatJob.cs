@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Medivh.Config;
 using Medivh.Models;
 
 namespace Medivh.DataStorage.HeartBeatData
@@ -17,10 +20,10 @@ namespace Medivh.DataStorage.HeartBeatData
     {
         private System.Threading.Timer timer;
         private static HeartBeatJob job = new HeartBeatJob();
-        private Queue<HeartBeatModel> funcQueue = new Queue<HeartBeatModel>();
+        private ConcurrentQueue<HeartBeatModel> funcQueue = new ConcurrentQueue<HeartBeatModel>();
 
         private long dueTime = 5 * 1000;
-        private long period = 10 * 1000;
+        private long period = 60 * 1000;
         Stopwatch swatch = new Stopwatch();
         private HeartBeatJob()
         {
@@ -30,7 +33,6 @@ namespace Medivh.DataStorage.HeartBeatData
         private void Action(object state)
         {
             var len = funcQueue.Count;
-            Console.WriteLine("[queue] :" + len);
             if (len <= 0)
             {
                 return;
@@ -39,17 +41,34 @@ namespace Medivh.DataStorage.HeartBeatData
             {
                 //先清空历史数据
                 HeartBeatDataStorage.Instance().Clear();
-
+                HeartBeatModel t;
                 for (int i = 0; i < len; i++)
                 {
-                    var t = funcQueue.Dequeue();
-                    if (t != null)
+
+                    var r1 = funcQueue.TryDequeue(out t);
+
+                    if (r1 && t != null)
                     {
                         swatch.Start();
-                        var r = t.Action();
-                        swatch.Stop(); 
-                        BaseModel model = new BaseModel() { Mark = t.Mark, ModuleType = ModuleTypeEnum.HeartBeatData, 
-                            Level = t.Level, Alias = t.Alias, Other = t.Other, Result = r ,RunTime = swatch.Elapsed.TotalMilliseconds};
+                        object r = null;
+                        try
+                        {
+                            r = t.Action();
+                        }
+                        catch (Exception ex)
+                        {
+                            r = ex;
+                        }
+                        swatch.Stop();
+                        BaseModel model = new BaseModel()
+                        {
+                            Mark = t.Mark,
+                            ModuleType = ModuleTypeEnum.HeartBeatData,
+                            Level = t.Level, 
+                            Other = t.Other,
+                            Result = r,
+                            RunTime = swatch.Elapsed.TotalMilliseconds
+                        };
                         swatch.Reset();
                         HeartBeatDataStorage.Instance().Add(model);
 
@@ -71,6 +90,12 @@ namespace Medivh.DataStorage.HeartBeatData
             {
                 return;
             }
+
+            if (funcQueue.Count > MedivhConfig.MaxHeartBeatCount)
+            {
+                throw new TargetParameterCountException("HeartBeat max count is " + MedivhConfig.MaxHeartBeatCount);
+            }
+
             funcQueue.Enqueue(model);
         }
 

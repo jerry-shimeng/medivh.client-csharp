@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Sockets;
+using System.Threading;
 using Medivh;
 using Medivh.Models;
 
@@ -10,95 +12,45 @@ namespace MedivhTest
 
 
         static void Main(string[] args)
-        {
-            MedivhSdk.SetLogger(Log);
-           
-            MedivhSdk.Init(new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = "aaaaaaaaaaaaaaaaaa"  }, "192.168.155.239", 5000);
-           
+        { 
 
-            Test();
-            Console.WriteLine("over");
+            Demo.Run();
+
+            //UsingProcess(); 
             Console.ReadKey();
         }
 
-        static void Test()
+
+        static void UsingProcess()
         {
-            for (int i = 0; i < 1000; i++)
+            using (var pro = Process.GetCurrentProcess())
             {
-                Exception ex = null;
-                try
+                //间隔时间（毫秒）
+                int interval = 1000;
+                //上次记录的CPU时间
+                var prevCpuTime = TimeSpan.Zero;
+                while (true)
                 {
-                    Ex();
-                }
-                catch (Exception ex1)
-                {
-                    ex = ex1;
-                }
-                var a = rdm.Next(1, 15);
-                if (ex != null)
-                {
-                    MedivhSdk.OnceCounter.ErrorCounter("text", ex, 1, i % a);
-                }
-                MedivhSdk.OnceCounter.BusinessCounter("test", a.ToString(), 1, i * 2 % a);
+                    //当前时间
+                    var curTime = pro.TotalProcessorTime;
+                    //间隔时间内的CPU运行时间除以逻辑CPU数量
+                    var value = (curTime - prevCpuTime).TotalMilliseconds / interval / Environment.ProcessorCount * 100;
+                    prevCpuTime = curTime;
+                    //输出
+                    Console.WriteLine(value);
 
-                MedivhSdk.OnceCounter.CustomCounter("mq send succeess" + i % 5, i * 2 % a, 1, "notify", "error");
-
-                MedivhSdk.HeartBeat.Add(new HeartBeatModel() { Mark = "test" + i % 5, Level = i * 2 % a, Action = Action });
+                    Thread.Sleep(interval);
+                }
             }
-
-        }
-        static Random rdm = new Random();
-        static void Ex()
-        {
-            var a = rdm.Next(15);
-            switch (a)
-            {
-                case 0:
-                    throw new SocketException(100);
-                case 1:
-                    throw new Exception();
-                case 2:
-                    throw new MyEx1();
-                case 3:
-                    throw new MyEx3();
-                case 4:
-                    throw new MyEx4();
-                case 5:
-                    throw new MyEx5();
-                case 6:
-                    throw new MyEx6();
-                case 7:
-                    throw new MyEx7();
-                case 8:
-                    throw new MyEx8();
-                case 9:
-                    throw new MyEx9();
-                case 10:
-                    throw new MyEx19();
-                case 11:
-                    throw new MyEx6a9();
-                case 12:
-                    throw new MyEx29();
-                case 13:
-                    throw new MyEx39();
-                case 14:
-                    throw new MyEx49();
-                case 15:
-                    throw new MyEx59();
-            }
-
         }
 
+  
 
-        static object Action()
-        {
-            return new { code = 0, data = DateTime.Now };
-        }
 
-        static void Log(string msg)
-        {
-            Console.WriteLine(msg);
-        }
+
+       
+
+       
     }
 
     class MyEx1 : Exception { }

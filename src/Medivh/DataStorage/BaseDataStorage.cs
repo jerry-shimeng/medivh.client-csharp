@@ -14,30 +14,30 @@ namespace Medivh.DataStorage
         public virtual IList<BaseModel> Get(CmdModel cmd)
         {
             Predicate<BaseModel> match = null;
-            if (string.IsNullOrWhiteSpace(cmd.Mark) && string.IsNullOrWhiteSpace(cmd.Alias))
-            {
+            if (string.IsNullOrWhiteSpace(cmd.Mark))
+            { 
                 match = cmd.Level == 0 ? new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType) : new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Level == cmd.Level);
             }
-            else if (!string.IsNullOrWhiteSpace(cmd.Mark) && string.IsNullOrWhiteSpace(cmd.Alias))
+            else if (!string.IsNullOrWhiteSpace(cmd.Mark) )
             {
                 match = cmd.Level == 0 ? new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Mark == (cmd.Mark)) : new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Level == cmd.Level && x.Mark == (cmd.Mark));
             }
-            else if (string.IsNullOrWhiteSpace(cmd.Mark) && !string.IsNullOrWhiteSpace(cmd.Alias))
+            else if (string.IsNullOrWhiteSpace(cmd.Mark) )
             {
-                match = cmd.Level == 0 ? match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Alias == (cmd.Alias)) : match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Level == cmd.Level && x.Alias == (cmd.Alias));
+                match = cmd.Level == 0 ? match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType ) : match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Level == cmd.Level );
             }
             else
             {
-                match = cmd.Level == 0 ? match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Alias == (cmd.Alias) && x.Mark == (cmd.Mark)) : match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Level == cmd.Level && x.Alias == (cmd.Alias) && x.Mark == (cmd.Mark));
+                match = cmd.Level == 0 ? match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType  && x.Mark == (cmd.Mark)) : match = new Predicate<BaseModel>(x => x.CounterType == cmd.CounterType && x.Level == cmd.Level  && x.Mark == (cmd.Mark));
             }
             return Get(match);
         }
 
-
-        public abstract object Clear();
+         
+         
 
         public abstract object ExecCmd(CmdModel model);
+         
 
-        
     }
 }

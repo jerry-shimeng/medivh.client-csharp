@@ -8,10 +8,10 @@ namespace Medivh.DataStorage.OnceData.Counter
     //业务计数器
     internal class BizCounter:OnceDataStorage
     {
-        private static DataCache cache = new DataCache();
+        private static DataCache cache = new DataCache(ModuleTypeEnum.OnceData, CounterTypeEnum.Business);
         public override void Add(BaseModel model)
         {
-            if (model == null || string.IsNullOrWhiteSpace(model.Alias))
+            if (model == null)
             {
                 return;
             }
@@ -22,10 +22,11 @@ namespace Medivh.DataStorage.OnceData.Counter
         {
             return cache.Get(match);
         }
+         
 
-        public override object Clear()
+        public override DataCache GetDataCache()
         {
-           return cache.Clear(); 
+            return cache;
         }
     }
 }

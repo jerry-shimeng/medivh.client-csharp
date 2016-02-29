@@ -8,7 +8,7 @@ namespace Medivh.DataStorage.OnceData.Counter
 {
     internal class CoustomCounter : OnceDataStorage
     {
-        private static DataCache cache = new DataCache();
+        private static DataCache cache = new DataCache(ModuleTypeEnum.OnceData, CounterTypeEnum.Custom);
         public override void Add(BaseModel model)
         {
             cache.Add(model);
@@ -42,10 +42,10 @@ namespace Medivh.DataStorage.OnceData.Counter
             }
             return slist.Select(s => new BaseModel() {Mark = s}).ToList();
         }
-
-        public override object Clear()
+         
+        public override DataCache GetDataCache()
         {
-           return cache.Clear(); 
+            return cache;
         }
     }
 }
