@@ -14,6 +14,32 @@ namespace Medivh.Config
         public string ServerIp { get; set; }
         public int ServerPort { get; set; }
 
+        private string _ApiPostUrl= "http://127.0.0.1:8080/v1/cmd/exec/add";
+
+        public string ApiPostUrl
+        {
+            get { return _ApiPostUrl; }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    _ApiPostUrl = "http://127.0.0.1:8080/v1/cmd/exec/add";
+                }
+                else
+                {
+                    if (value.LastIndexOf('/') < value.Length -1)
+                    {
+                        _ApiPostUrl = value + "/v1/cmd/exec/add";
+                    }
+                    else
+                    {
+                        _ApiPostUrl = value + "v1/cmd/exec/add";
+                    }
+                }
+            }
+        }
+        
+
         private static int maxHeartBeatCount = 100;
 
         /// <summary>

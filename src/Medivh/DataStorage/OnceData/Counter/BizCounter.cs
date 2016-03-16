@@ -18,11 +18,11 @@ namespace Medivh.DataStorage.OnceData.Counter
             cache.Add(model);
         }
 
-        public override IList<BaseModel> Get(Predicate<BaseModel> match)
-        {
-            return cache.Get(match);
-        }
-         
+//        public override IList<BaseModel> Get(Predicate<BaseModel> match)
+//        {
+//            return cache.Get(match);
+//        }
+//         
 
         public override DataCache GetDataCache()
         {

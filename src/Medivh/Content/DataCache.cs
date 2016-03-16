@@ -24,12 +24,11 @@ namespace Medivh.Content
         {
             this.ModuleType = module;
             this.CounterType = counter;
-            //启动数据整合 ，根据分钟整合
+            //启动数据整合 ，根据小时整合
             AddByCondense();
         }
 
-        private ConcurrentQueue<BaseModel> dataQueue = new ConcurrentQueue<BaseModel>();
-        private int maxLength = 200;
+        private ConcurrentQueue<BaseModel> dataQueue = new ConcurrentQueue<BaseModel>(); 
         /// <summary>
         /// 添加数据
         /// 添加的数据如果超过设置的最大数量，则压缩数据，压缩方式是已小时为单位，合并现有数据
@@ -50,8 +49,7 @@ namespace Medivh.Content
 
         /// <summary>
         /// 压缩数据的方式添加
-        /// </summary>
-        /// <param name="model"></param>
+        /// </summary> 
         internal void AddByCondense()
         {
             Task.Run(() =>
@@ -68,69 +66,40 @@ namespace Medivh.Content
                         Thread.Sleep(50);
                     }
                 }
-            });
-
-
-
-            //if (model != null)
-            //{
-            //    model = ConvertObjectTime(model);
-
-            //    var obj = dataQueue.ToList()
-            //        .FirstOrDefault(
-            //            temp =>
-            //                temp.CreateTime == model.CreateTime && temp.Mark.Equals(model.Mark) &&
-            //                temp.Level == model.Level &&
-            //                temp.ModuleType == model.ModuleType && temp.CounterType == model.CounterType &&
-            //                temp.Result == model.Result);
-
-            //    if (obj != null)
-            //    {
-            //        obj.Count += model.Count;
-            //    }
-            //    else
-            //    {
-            //        AddQueue(model);
-            //    }
-            //}
+            }); 
         }
 
 
         #region 普通操作
 
-        /// <summary>
-        /// 废弃
-        /// </summary>
-        /// <param name="match"></param>
-        /// <returns></returns>
-        internal IList<BaseModel> Get(Predicate<BaseModel> match)
-        {
-            return CacheCenter.Get(match);
-            //if (match == null)
-            //{
-            //    return null;
-            //}
-            //return dataQueue.ToList().FindAll(match);
-        }
+//        /// <summary>
+//        /// 废弃
+//        /// </summary>
+//        /// <param name="match"></param>
+//        /// <returns></returns>
+//        internal IList<BaseModel> Get(Predicate<BaseModel> match)
+//        {
+//            return CacheCenter.Get(match); 
+//        }
 
-        /// <summary>
-        /// 获取并清空当前列表
-        /// 最大获取200条数据
-        /// </summary>
-        /// <returns></returns>
-        internal object GetAndClear()
-        {
-            return CacheCenter.GetAndClear(this.ModuleType, this.CounterType);
-        }
+//        /// <summary>
+//        /// 获取并清空当前列表
+//        /// 最大获取200条数据
+//        /// </summary>
+//        /// <returns></returns>
+//        internal object GetAndClear()
+//        {
+//            return CacheCenter.GetAndClear(this.ModuleType, this.CounterType);
+//        }
 
-        /// <summary>
-        /// 废弃
-        /// </summary>
-        /// <returns></returns>
-        internal List<BaseModel> GetAll()
-        {
-            return null;
-        }
+//        /// <summary>
+//        /// 废弃
+//        /// </summary>
+//        /// <returns></returns>
+//        internal List<BaseModel> GetAll()
+//        {
+//            return null;
+//        }
 
         internal bool GetOne(out BaseModel model)
         {

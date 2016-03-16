@@ -9,19 +9,19 @@ namespace Medivh.Models
     {
         public BaseModel()
         {
-            this.CreateTime = DateTime.UtcNow.Unix();
+            this.CreateTime = DateTimeHelper.GetMinuteUnix(); //DateTime.UtcNow.Unix();
         }
         public ModuleTypeEnum ModuleType { get; set; }
         public CounterTypeEnum CounterType { get; set; }
         public string Mark { get; set; }
         public int Count { get; set; }
-        public List<string> Other { get; set; }
+//        public List<string> Other { get; set; }
         public long CreateTime { get; set; }
         public int Level { get; set; }
         public object Result { get; set; }
         public double RunTime { get; set; }
 
-        public string AppKey { get { return MedivhSdk.Client.AppKey; } }
+        public string AppKey { get { return MedivhSdk._ClientInfo.AppKey; } }
 
         internal void Check()
         {
@@ -32,16 +32,16 @@ namespace Medivh.Models
             }
 
 
-            if (this.Other != null && this.Other.Count > 0)
-            {
-                for (int i = 0; i < Other.Count; i++)
-                {
-                    if (Other[i].IndexOf("\n", StringComparison.Ordinal) >= 0)
-                    {
-                        Other[i] = Other[i].Replace("\n", " ");
-                    }
-                }
-            }
+//            if (this.Other != null && this.Other.Count > 0)
+//            {
+//                for (int i = 0; i < Other.Count; i++)
+//                {
+//                    if (Other[i].IndexOf("\n", StringComparison.Ordinal) >= 0)
+//                    {
+//                        Other[i] = Other[i].Replace("\n", " ");
+//                    }
+//                }
+//            }
 
             //result 中\n替换
             if (Result != null)

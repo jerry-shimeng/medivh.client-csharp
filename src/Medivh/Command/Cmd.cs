@@ -58,17 +58,15 @@ namespace Medivh.Command
             {
                 switch (model.ModuleType)
                 {
-                    case ModuleTypeEnum.OnceData:
-                        return OnceDataStorage.Instance(model).ExecCmd(model);
-                        break;
-                    case ModuleTypeEnum.HeartBeatData:
-                        return HeartBeatDataStorage.Instance().ExecCmd(model);
-                        break;
-                    case ModuleTypeEnum.SystemData:
-                        obj = SystemDataStorage.GetSystemInfo();
-                        break;
-                    //case ModuleTypeEnum.TransactionData:
-                    //    break;
+//                    case ModuleTypeEnum.OnceData:
+//                        return OnceDataStorage.Instance(model).ExecCmd(model);
+//                        break;
+//                    case ModuleTypeEnum.HeartBeatData:
+//                        return HeartBeatDataStorage.Instance().ExecCmd(model);
+//                        break;
+//                    case ModuleTypeEnum.SystemData:
+//                        obj = SystemDataStorage.GetSystemInfo();
+//                        break; 
                     default:
                         break;
                 }

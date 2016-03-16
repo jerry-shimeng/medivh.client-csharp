@@ -65,7 +65,7 @@ namespace Medivh.DataStorage.HeartBeatData
                             Mark = t.Mark,
                             ModuleType = ModuleTypeEnum.HeartBeatData,
                             Level = t.Level, 
-                            Other = t.Other,
+//                            Other = t.Other,
                             Result = r,
                             RunTime = swatch.Elapsed.TotalMilliseconds
                         };

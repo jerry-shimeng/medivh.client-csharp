@@ -18,6 +18,6 @@ namespace Medivh.Models
         public int Level { get; set; }
 
         public string Alias { get; set; }
-        public List<string> Other { get; set; }
+//        public List<string> Other { get; set; }
     }
 }

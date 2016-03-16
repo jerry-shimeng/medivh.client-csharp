@@ -10,12 +10,11 @@ namespace Medivh.SdkMain
 
         /// <summary>
         /// 错误计数器
-        /// </summary>
-        /// <param name="mark"></param>
+        /// </summary> 
         /// <param name="ex"></param>
         /// <param name="num"></param>
         /// <param name="level"></param>
-        public void ErrorCounter(Exception ex, int num = 1, int level = 0)
+        public void ErrorCounter(Exception ex, int level = 0, int num = 1)
         {
             if (ex == null)
             {
@@ -34,12 +33,11 @@ namespace Medivh.SdkMain
 
         /// <summary>
         /// 业务计数器
-        /// </summary>
-        /// <param name="mark"></param>
+        /// </summary> 
         /// <param name="busName"></param>
         /// <param name="num"></param>
         /// <param name="level"></param>
-        public void BusinessCounter(string busName, int num = 1, int level = 0)
+        public void BusinessCounter(string busName, int level = 0,int num = 1)
         {
             try
             {
@@ -58,7 +56,7 @@ namespace Medivh.SdkMain
         /// <param name="level"></param>
         /// <param name="num"></param>
         /// <param name="s"></param>
-        public void CustomCounter(string mark, int level, int num = 1, params string[] s)
+        public void CustomCounter(string mark, int level = 0, int num = 1)
         {
             try
             {

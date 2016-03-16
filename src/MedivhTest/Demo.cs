@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Medivh;
+using Medivh.Config;
 using Medivh.Models;
 
 namespace MedivhTest
@@ -16,8 +17,14 @@ namespace MedivhTest
         {
             //初始化日志记录器
             MedivhSdk.SetLogger(Log, 1);
+
+            MedivhConfig config = new MedivhConfig();
+            config.Client = new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = "aaaaaaaaaaaaaaaaaa", AppSecret = "..." };
+            config.ServerIp = "192.168.155.106";
+            config.ServerPort = 5000;
+
             //初始化medivh引擎
-            MedivhSdk.Init(new ClientInfo() { AppName = "消息中心监控测试NO1", AppKey = "aaaaaaaaaaaaaaaaaa", AppSecret = "..." }, "192.168.155.239", 5000);
+            MedivhSdk.Init(config);
 
             //添加测试数据
 
@@ -28,17 +35,18 @@ namespace MedivhTest
         static Random rdm = new Random();
         static void Test()
         {
-            while (true)
+            var i = 0;
+            while (i < 1000000)
             {
-                var a = rdm.Next(1, 30);
+                i++;
                 //业务计数器
-                MedivhSdk.OnceCounter.BusinessCounter("业务" + a, 1, a % 30);
+                MedivhSdk.OnceCounter.BusinessCounter("业务" + i % 5, 1);
                 ////自定义计数器
-                MedivhSdk.OnceCounter.CustomCounter("自定义" + a, a % 30);
-                //Console.Write(". ");
-                Thread.Sleep(a * 1000);
+                MedivhSdk.OnceCounter.CustomCounter("自定义" + i % 5, 1);
+                //Console.Write(". "); 
+                Thread.Sleep(50);
             }
-        }
+        } 
         static string Action()
         {
             return "0";

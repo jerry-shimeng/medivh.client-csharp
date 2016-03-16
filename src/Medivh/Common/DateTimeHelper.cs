@@ -2,35 +2,23 @@
 
 namespace Medivh.Common
 {
-    public  static class DateTimeHelper
+    public static class DateTimeHelper
     {
         public static long Unix(this DateTime dt)
         {
-            return (long)(dt - DateTime.Parse("1970-01-01")).TotalSeconds; 
+            return (long)(dt - DateTime.Parse("1970-01-01")).TotalSeconds;
         }
 
-        public static DateTime UnixToDateTime(long d)
+        public static long GetNowHourUnix()
         {
-            System.DateTime time = System.DateTime.MinValue;
-            System.DateTime startTime = (new System.DateTime(1970, 1, 1));
-            time = startTime.AddSeconds(d);
-            return time;
+            return (long)(DateTime.UtcNow - DateTime.Parse("1970-01-01")).TotalHours * 60 * 60;
         }
 
-        /// <summary>
-        /// 转换为以小时为单位的unix
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        public static long ConvertToMinutesUnix(DateTime dt)
+        public static long GetMinuteUnix()
         {
-            return (long) (dt - DateTime.Parse("1970-01-01")).TotalMinutes*60;
-        }
+            var r = (long)(DateTime.UtcNow - DateTime.Parse("1970-01-01")).TotalMinutes / 10;
 
-
-        public static long GetNowMinutesUnix()
-        {
-            return (long)(DateTime.UtcNow - DateTime.Parse("1970-01-01")).TotalMinutes * 60;
+            return r * 10 * 60;
         }
     }
 }

@@ -8,6 +8,6 @@ namespace Medivh.Contract
     {
         void Add(BaseModel model);
 
-        IList<BaseModel> Get(Predicate<BaseModel> match);
+//        IList<BaseModel> Get(Predicate<BaseModel> match);
     }
 }

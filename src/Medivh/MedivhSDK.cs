@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Medivh.Common;
 using Medivh.Config;
+using Medivh.DataPush;
 using Medivh.DataStorage.HeartBeatData;
 using Medivh.Logger;
 using Medivh.Models;
@@ -13,17 +14,17 @@ namespace Medivh
 {
     public class MedivhSdk
     {
-        public static ClientInfo Client { get; private set; }
+        public static ClientInfo _ClientInfo { get; private set; }
         /// <summary>
         /// 设置日志记录
         /// </summary>
         /// <param name="action"></param>
         /// <param name="logLevel">0 product 1debug</param>
-        public static void SetLogger(Action<string> action,uint logLevel = 0)
+        public static void SetLogger(Action<string> action, uint logLevel = 0)
         {
             LogHelper.Init(action, logLevel);
         }
- 
+
 
         /// <summary>
         /// 类型计数器
@@ -38,9 +39,9 @@ namespace Medivh
         /// <summary>
         /// 初始化
         /// </summary>
-        public static void Init(ClientInfo info, string ip, int port)
+        private static void Init(ClientInfo info, string ip, int port)
         {
-            Client = info;
+            _ClientInfo = info;
             LogHelper.Info("Medivh starting！");
             try
             {
@@ -49,10 +50,13 @@ namespace Medivh
                 string json = String.Empty;
                 if (info != null)
                 {
-                    json =  JsonHelper.JsonObjectToString(info);
+                    json = JsonHelper.JsonObjectToString(info);
                 }
+                //启动网络连接
+                TcpClient.RunAync(ip, port, json);
 
-                new Client().RunAync(ip, port, json);  
+                //启动消息推送
+                new PushClient().RunAync();
 
                 LogHelper.Info("Medivh success！");
             }
@@ -72,6 +76,7 @@ namespace Medivh
             {
                 throw new Exception("param config is null");
             }
+            ConfigHelper.SetMedivhConfig(config);
             Init(config.Client, config.ServerIp, config.ServerPort);
         }
 
@@ -79,8 +84,6 @@ namespace Medivh
         {
             OnceCounter = new CounterStorageMain();
             HeartBeat = new HeartBeatStorageMain();
-
-         
         }
     }
 }

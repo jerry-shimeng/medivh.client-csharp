@@ -23,12 +23,8 @@ namespace Medivh.Content
         /// <param name="model"></param>
         public static void Set(BaseModel model)
         {
-            //分解数据。 先获取对象对应的hashkey
-            ConvertObjectTime(model);
-
+            //分解数据。 先获取对象对应的hashkey 
             string key = GetKey(model);
-
-
             //判断dict中是否有该key
 
             lock ("Medivh.Content.CacheCenter.operation")
@@ -51,7 +47,7 @@ namespace Medivh.Content
                 {
                     dict.Add(key, model);
                     list.Add(model);
-                } 
+                }
             }
         }
 
@@ -59,14 +55,14 @@ namespace Medivh.Content
         /// 获取并清除这部分数据
         /// </summary>
         /// <returns></returns>
-        public static IList<BaseModel> GetAndClear(ModuleTypeEnum module,CounterTypeEnum counter)
+        public static IList<BaseModel> GetAndClear(ModuleTypeEnum module, CounterTypeEnum counter)
         {
             IList<BaseModel> r = new List<BaseModel>();
 
             lock ("Medivh.Content.CacheCenter.operation")
             {
                 r = list.Where(x => x.ModuleType == module && x.CounterType == counter).ToList();
-                list.RemoveAll(x => x.ModuleType == module && x.CounterType == counter); 
+                list.RemoveAll(x => x.ModuleType == module && x.CounterType == counter);
 
                 //删除dict里面的数据
                 foreach (BaseModel baseModel in r)
@@ -77,26 +73,62 @@ namespace Medivh.Content
             return r;
         }
 
+
+
+        /// <summary>
+        /// 获取并清除全部数据
+        /// </summary>
+        /// <returns></returns>
+        public static IList<BaseModel> GetAndClear()
+        {
+            IList<BaseModel> r = null;
+
+            lock ("Medivh.Content.CacheCenter.operation")
+            {
+                r = list;
+                list = new List<BaseModel>(); ;
+
+                //删除dict里面的数据
+                dict = new Dictionary<string, BaseModel>(); 
+            }
+            return r;
+        }
+
+        internal static void Set(IList<BaseModel> list)
+        {
+            if (list == null || list.Count == 0)
+            {
+                return;
+            }
+            else
+            {
+                foreach (var model in list)
+                {
+                    Set(model);
+                }
+            }
+        }
+
         private static string GetKey(BaseModel model)
         {
-            return string.Format("{0}:{1}:{2}:{3}:{4}:{5}", model.Mark, model.Level, model.CreateTime, model.ModuleType,
-                model.CounterType, model.Result);
+            var sb = new StringBuilder(100);
+            sb = sb.Append(model.Mark).Append(":")
+                .Append(model.Level).Append(":")
+                .Append(model.CreateTime).Append(":")
+                .Append(model.ModuleType).Append(":")
+                .Append(model.CounterType).Append(":")
+                .Append(model.Result);
+
+            return sb.ToString();
+            //            return string.Format("{0}:{1}:{2}:{3}:{4}:{5}", model.Mark, model.Level, model.CreateTime, model.ModuleType,
+            //                model.CounterType, model.Result);
 
         }
 
-        public static IList<BaseModel> Get(Predicate<BaseModel> match)
-        {
-            return list.FindAll(match);
-        }
-
-        #region 数据压缩
-
-        //将对象的时间转换为以小时为单位的unix
-        public static void ConvertObjectTime(BaseModel model)
-        {
-            model.CreateTime = DateTimeHelper.ConvertToMinutesUnix(DateTimeHelper.UnixToDateTime(model.CreateTime));
-        }
-
-        #endregion
+//        public static IList<BaseModel> Get(Predicate<BaseModel> match)
+//        {
+//            return list.FindAll(match);
+//        }
+ 
     }
 }
